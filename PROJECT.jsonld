@@ -1,0 +1,26 @@
+{
+  "@context": "https://schema.org/",
+  "@type": "Project",
+  "name": "Etzhayyim Collector Project (etzhayyim-project-collector)",
+  "status": "In Progress",
+  "identifier": "etzhayyim-project-collector",
+  "description": "Unified SpinApp collector project for global DNS/IP/RDAP intelligence collection and JSON-LD export.",
+  "hasPart": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "Network Intel Collector",
+      "url": "wasm/network-intel-collector-component"
+    },
+    {
+      "@type": "CreativeWork",
+      "name": "Targets",
+      "url": "config/targets.json"
+    }
+  ],
+  "tasks": [
+    {
+      "status": "in_progress",
+      "task": "Consolidate similar collector components into etzhayyim-project-collector."
+    }
+  ]
+}
