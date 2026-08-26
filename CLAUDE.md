@@ -10,7 +10,13 @@ Unified collector App (`collector.etzhayyim.com`) — network intelligence, reso
 
 ## App
 
-- Runtime: Single Worker (TS Native + SvelteKit SSR)
+- Runtime: Single Worker (TS Native + static assets). Frontend: reagent +
+  re-frame + jp-go-dds, `appview/etzhayyim-wasm-collector-c0ll3ct1/cljs/`
+  (migrated from SvelteKit SSR 2026-08-26; the XRPC BFF route handler that
+  used to live at `svelte/src/routes/xrpc/[...path]/+server.ts` moved
+  byte-identical to `appview/etzhayyim-wasm-collector-c0ll3ct1/
+  src/xrpc-mcp-router-proxy.ts` — see that file's header, it does not run
+  as-is without SvelteKit).
 - Deploy: `etzhayyim build && etzhayyim deploy --from .`
 
 ## XRPC API

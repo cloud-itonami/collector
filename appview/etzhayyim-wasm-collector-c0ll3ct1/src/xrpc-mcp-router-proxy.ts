@@ -1,3 +1,22 @@
+// PROVENANCE: moved byte-identical from
+// `svelte/src/routes/xrpc/[...path]/+server.ts` during the Svelte -> ClojureScript
+// migration (agent/cljs-migration, see appview/etzhayyim-wasm-collector-c0ll3ct1/cljs/).
+// This is a SvelteKit server route handler, not a plain Cloudflare Worker module:
+// it imports `@sveltejs/kit` and the SvelteKit-generated `./$types`, and it was only
+// reachable because `wrangler.jsonc`'s `main` deployed the SvelteKit build
+// (`svelte/.svelte-kit/cloudflare/_worker.js`), which routed POST /xrpc/{path} here.
+// Now that `svelte/` has been deleted, this file WILL NOT RUN AS-IS: the SvelteKit
+// build no longer exists, `./$types` cannot be generated, and nothing wires this
+// handler into a request path. It is preserved verbatim (not deleted, not rewritten)
+// because it is a real HTTP backend behavior (POST /xrpc/{nsid} -> forwards to the
+// MCP router as a `tools/call` JSON-RPC request, unwraps `structuredContent`, no-store
+// caching, permissive CORS OPTIONS), and reviving it — e.g. porting it to a plain
+// `ExportedHandler<Env>` alongside `src/app.ts`, or wiring it through the
+// `assets.directory` Worker mentioned in `wrangler.jsonc` — is a product decision for
+// a human/operator, not something this migration agent decides.
+//
+// Original content follows unmodified below this header.
+
 import { json, type RequestEvent } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
