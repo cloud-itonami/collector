@@ -41,16 +41,26 @@ ba3e3bd 2026-07-20T01:43:37+09:00
 **`git checkout ba3e3bd` を飛ばさないこと。** この文書自身が `main` に載っている
 ので、`main` の tracked file 数は 26 より多い。step 2〜6 の期待出力は `ba3e3bd`
 に対する実測であり、そこに固定して初めて逐語で一致する。`main` の側で歩きたい
-場合は、数だけが増えて中身の判定（step 2〜6）は変わらない —— `kotoba/` と
-`appview/` と `config/` は `ba3e3bd` 以降変わっていない。
+場合は、数だけが増えて `kotoba/` と `config/` の中身の判定（step 2〜5）は変わらない。
 
-tracked file は 26 本で、実体は 3 つに分かれている:
+⚠ **`appview/` は `ba3e3bd` 以降変わっている。** 2026-08-26 の Svelte →
+ClojureScript フロントエンド移行（`appview/etzhayyim-wasm-collector-c0ll3ct1/svelte`
+を削除し、同じ内容を reagent + re-frame + jp-go-dds で `appview/
+etzhayyim-wasm-collector-c0ll3ct1/cljs/` に再実装、バックエンドの XRPC route
+ハンドラ `svelte/src/routes/xrpc/[...path]/+server.ts` は byte-identical に
+`src/xrpc-mcp-router-proxy.ts` へ移動）で `main` の側だけ変わった。step 6 の
+DNS/HTTP 到達性の実測（appview は live ではない）はこの移行の影響を受けない
+（ホスト名の A レコード有無の話なので）。ただし下記の facade 食い違いの節は
+`ba3e3bd` 時点の SvelteKit ビルドについての記述であり、移行後は変わっている
+ので読み替えること。
 
-| 場所 | 中身 | この文書での扱い |
+tracked file は 26 本（`ba3e3bd` 時点）で、実体は 3 つに分かれている:
+
+| 場所 | 中身（`ba3e3bd` 時点 / `main` 現在） | この文書での扱い |
 |---|---|---|
-| `kotoba/` | public network-intelligence レジストリの TS 実装 + vitest スイート | step 2〜4 |
-| `appview/etzhayyim-wasm-collector-c0ll3ct1/` | SvelteKit + Cloudflare Worker の edge facade | step 6 |
-| `config/targets.json` | 収集対象（15 ドメイン / 10 IP / 6 レコード型） | step 5 |
+| `kotoba/` | public network-intelligence レジストリの TS 実装 + vitest スイート（不変） | step 2〜4 |
+| `appview/etzhayyim-wasm-collector-c0ll3ct1/` | `ba3e3bd`: SvelteKit + Cloudflare Worker の edge facade。`main`: reagent + re-frame + jp-go-dds（cljs）+ 同じ Worker | step 6 |
+| `config/targets.json` | 収集対象（15 ドメイン / 10 IP / 6 レコード型、不変） | step 5 |
 
 ---
 
@@ -238,11 +248,12 @@ collector.etzhayyim.com -> 000
 生きている）。`000` は HTTP の応答ではなく、curl が接続に到達しなかったことを表す。
 **この appview は今日 live ではない。**
 
-もう 1 つ、配備したときに効く既知の食い違いがある。この workspace の検出器が
-名指ししている:
+もう 1 つ、`ba3e3bd` 時点で配備したときに効いていた既知の食い違いがある
+（この節は歴史的記述 —— 下記のとおり `main` では前提が変わっている）。
+この workspace の検出器が名指ししていた:
 
 ```bash
-# superproject 側で
+# superproject 側で（ba3e3bd 時点の appview/ に対して実測）
 nbb --classpath ".:scripts/nbb_compat" scripts/verify-appview-facade.cljs | grep collector
 ```
 
@@ -256,6 +267,18 @@ wrangler が `main` として配るのは SvelteKit のビルド成果物
 `+page.svelte` と `xrpc/[...path]/+server.ts` の 2 本しかない。
 **この service を `/health` で死活監視すると SvelteKit の 404 を叩く。**
 読む人が開くファイル（`src/app.ts`）と、配られるファイルが別物である。
+
+**2026-08-26 の Svelte → ClojureScript 移行後、この検出器の引用文はそのままでは
+成立しない。** `svelte/` を削除したので `svelte/src/` も
+`svelte/.svelte-kit/cloudflare/_worker.js` も存在せず、`wrangler.jsonc` の
+`main` はその移行で削った（`assets.directory` を `./cljs/public` に向け直した
+だけで、`main` を `src/app.ts` へは付け替えていない —— `src/app.ts` は
+`env.ASSETS.fetch()` を呼ばないため、それをすると静的アセットの手前に
+何も返さない Worker が立つ）。**したがって `main` が存在しない設定になり、
+`/health` は依然として `src/app.ts` にしかない —— この facade の不一致
+自体は形を変えて残っている可能性が高いが、`verify-appview-facade.cljs` を
+移行後の tree に対して再実行して確かめてはいない（UNVERIFIED）。** 次にこの
+節を歩く人は、まずこの検出器を現在の `appview/` に対して再実行すること。
 
 ---
 
@@ -283,7 +306,8 @@ step 4 の `mut` は各変異のあとに必ず元へ戻すが、途中で中断
 | 収集対象は実在するか | **する**。DNS / RDAP は今日引ける（step 5） |
 | 6 つの source のうち到達性を実証できたのは | **2 つ**（`dns` / `rdap`）。残り 4 つは型だけ |
 | appview は live か | **live ではない**（A レコード無し, step 6） |
-| 配備したら `/health` は答えるか | **答えない**（facade の食い違い, step 6） |
+| 配備したら `/health` は答えるか | `ba3e3bd` 時点は**答えない**（facade の食い違い, step 6）。移行後の `main` は **UNVERIFIED** |
+| appview のフロントエンドは何か | `ba3e3bd`: SvelteKit。`main`（2026-08-26 以降）: reagent + re-frame + jp-go-dds、`appview/etzhayyim-wasm-collector-c0ll3ct1/cljs/` |
 
 次に手を入れるなら、費用が最も小さくて効果が確実なのは step 4 が名指しした
 **3 本の reject パスのテスト**（`invalidSeverity` / `invalidSubjectType` /

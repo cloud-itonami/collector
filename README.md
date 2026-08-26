@@ -13,7 +13,7 @@ app プロジェクトである。
 | 場所 | 中身 |
 |---|---|
 | `kotoba/` | public レジストリの TS 実装（`registry.ts` / `types.ts`）と vitest スイート |
-| `appview/etzhayyim-wasm-collector-c0ll3ct1/` | SvelteKit + Cloudflare Worker の edge facade |
+| `appview/etzhayyim-wasm-collector-c0ll3ct1/` | reagent + re-frame + jp-go-dds（`cljs/`）+ Cloudflare Worker の edge facade（`src/app.ts`）。2026-08-26 に Svelte から移行 |
 | `config/targets.json` | 収集対象 — 15 ドメイン・10 IP・6 レコード型 |
 | `CLAUDE.md` | 実装の内側（XRPC service 定義・Kysely/RisingWave の保管経路・グラフモデル） |
 
@@ -64,8 +64,14 @@ abuse report の被害者・通報者 PII（`abuseReport`）は **etzhayyim 側�
   `invalidSubjectType` / `itemsCollectedMustBeNonNegInt`。実装はこれらを
   拒否するが、スイートは妥当な値しか渡していないので拒否を一度も観測して
   いない（quickstart step 4 の変異 M5〜M7 が緑のまま）。
-- **`/health` が配備物に無い**: `/health` と `/_app/meta` を持つのは
-  `appview/*/src/app.ts` だが、`wrangler.jsonc` の `main` は SvelteKit の
-  ビルド成果物を配る。死活監視を `/health` に向けると SvelteKit の 404 を叩く
-  （workspace の検出器 `scripts/verify-appview-facade.cljs` が名指ししている）。
-- 移行の残件は [`MIGRATION-TODO.md`](MIGRATION-TODO.md) と `migration.edn`。
+- **`/health` は配備物に無いままの可能性がある（UNVERIFIED）**: `/health` と
+  `/_app/meta` を持つのは `appview/*/src/app.ts` だけ。2026-08-26 の
+  Svelte→ClojureScript 移行で `wrangler.jsonc` の `main`（旧: SvelteKit の
+  ビルド成果物）は削除し、`assets.directory` を `./cljs/public` に向け直した
+  （`src/app.ts` へは付け替えていない — `env.ASSETS.fetch()` を呼ばないため）。
+  したがって `main` 不在の今も `/health` は依然として `src/app.ts` にしかない。
+  workspace の検出器 `scripts/verify-appview-facade.cljs` を移行後の tree に
+  対して再実行して確かめてはいない（`docs/operator-quickstart.md` step 6 参照）。
+- 移行の残件は [`MIGRATION-TODO.md`](MIGRATION-TODO.md) と `migration.edn`
+  （これらは AT Protocol 移行についての別件で、Svelte→ClojureScript のフロント
+  エンド移行とは無関係）。

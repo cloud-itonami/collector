@@ -1,6 +1,12 @@
 {
   "name": "kotodama-c0ll3ct1",
-  "main": "svelte/.svelte-kit/cloudflare/_worker.js",
+  // "main" dropped 2026-08-26 (Svelte -> ClojureScript migration): it used to
+  // point at the SvelteKit build (`svelte/.svelte-kit/cloudflare/_worker.js`),
+  // which no longer exists now that `svelte/` is deleted. `src/app.ts` is a
+  // real Worker (health/meta + XRPC-to-dispatcher proxy) but it does NOT call
+  // `env.ASSETS.fetch()`, so it must not be repointed here as `main` — doing
+  // so would put a worker in front of the static assets with nothing serving
+  // them. UNVERIFIED: no `wrangler deploy`/`dev` was run to confirm this.
   "compatibility_date": "2025-03-17",
   "compatibility_flags": [
     "nodejs_compat",
@@ -13,7 +19,7 @@
     "APP_DESCRIPTION": "Thin edge facade; collector business logic runs in BPMN + Zeebe Python",
     "APP_DISPLAY_NAME": "etzhayyim Collector",
     "APP_EMBED_URL": "https://c0ll3ct1.etzhayyim.com/?embed=1",
-    "APP_FRAMEWORK": "sveltekit-edge-bff",
+    "APP_FRAMEWORK": "cljs-reagent-re-frame-jp-go-dds",
     "APP_NANOID": "c0ll3ct1",
     "APP_PERFORMER_TYPE": "service",
     "APP_SOURCE": "custom",
@@ -30,7 +36,7 @@
     }
   ],
   "assets": {
-    "directory": "./svelte/.svelte-kit/cloudflare/client",
+    "directory": "./cljs/public",
     "binding": "ASSETS",
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "none"
