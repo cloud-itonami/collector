@@ -254,7 +254,7 @@ collector.etzhayyim.com -> 000
 
 ```bash
 # superproject 側で（ba3e3bd 時点の appview/ に対して実測）
-nbb --classpath ".:scripts/nbb_compat" scripts/verify-appview-facade.cljs | grep collector
+kbb --backend sci --classpath ".:scripts/nbb_compat" scripts/verify-appview-facade.cljs | grep collector
 ```
 
 → `health-only-in-undeployed-facade:orgs/cloud-itonami/collector — appview/*/src/app.ts
