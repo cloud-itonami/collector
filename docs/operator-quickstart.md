@@ -17,7 +17,7 @@ macOS 26.3 arm64・node v26.3.0・npm 11.16.0。必要なのは `git` / `node` /
 無ければ step 1 → 2 → 3 だけでよい。
 
 この repo が何であるかは [`README.md`](../README.md)、実装の内側は
-[`CLAUDE.md`](../CLAUDE.md)。この文書は**外から踏める手順だけ**を扱う。
+[`AGENTS.md`](../AGENTS.md)。この文書は**外から踏める手順だけ**を扱う。
 
 ---
 
