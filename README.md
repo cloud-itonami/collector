@@ -15,7 +15,7 @@ app プロジェクトである。
 | `kotoba/` | public レジストリの TS 実装（`registry.ts` / `types.ts`）と vitest スイート |
 | `appview/etzhayyim-wasm-collector-c0ll3ct1/` | reagent + re-frame + jp-go-dds（`cljs/`）+ Cloudflare Worker の edge facade（`src/app.ts`）。2026-08-26 に Svelte から移行 |
 | `config/targets.json` | 収集対象 — 15 ドメイン・10 IP・6 レコード型 |
-| `CLAUDE.md` | 実装の内側（XRPC service 定義・Kysely/RisingWave の保管経路・グラフモデル） |
+| `AGENTS.md` | 実装の内側（XRPC service 定義・Kysely/RisingWave の保管経路・グラフモデル） |
 
 ## 4 つの公開コレクション
 
